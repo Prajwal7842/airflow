@@ -54,8 +54,9 @@ AUTH_TYPE = AUTH_DB
 # AUTH_ROLE_ADMIN = 'Admin'
 
 # Uncomment and set to desired role to enable access without authentication
-# AUTH_ROLE_PUBLIC = 'Viewer'
+AUTH_ROLE_PUBLIC = 'Admin'
 
+AIRFLOW__API_AUTH__JWT_TOKEN = '123'
 # Will allow user self registration
 # AUTH_USER_REGISTRATION = True
 

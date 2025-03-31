@@ -101,6 +101,7 @@ class DagBundlesManager(LoggingMixin):
             return
 
         config_list = conf.getjson("dag_processor", "dag_bundle_config_list")
+        self.log.info("[Prajwal][dag-processing][parse-config] {}".format(config_list))
         if not config_list:
             return
         if not isinstance(config_list, list):
@@ -109,7 +110,8 @@ class DagBundlesManager(LoggingMixin):
                 f"must be list but got {config_list.__class__}"
             )
         _validate_bundle_config(config_list)
-        if conf.getboolean("core", "LOAD_EXAMPLES"):
+        self.log.info("[Prajwal][dag-processing][parse-config] {}".format(conf.getboolean("core", "LOAD_EXAMPLES")))
+        if conf.getboolean("core", "LOAD_EXAMPLES") or True:
             _add_example_dag_bundle(config_list)
 
         for cfg in config_list:
