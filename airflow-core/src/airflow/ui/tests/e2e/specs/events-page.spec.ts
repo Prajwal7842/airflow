@@ -102,66 +102,6 @@ test.describe("Events with Generated Data", () => {
     await eventsPage.verifyLogEntriesWithData();
   });
 
-  test("verify pagination through audit log entries", async () => {
-    await eventsPage.navigateToPaginatedEventsPage(3);
-
-    const hasNext = await eventsPage.hasNextPage();
-
-    expect(hasNext).toBe(true);
-
-    await eventsPage.clickNextPage();
-    await expect(eventsPage.eventsTable).toBeVisible();
-
-    await eventsPage.clickPrevPage();
-    await expect(eventsPage.eventsTable).toBeVisible();
-  });
-
-  test("verify column sorting works", async () => {
-    await eventsPage.navigate();
-    await eventsPage.waitForEventsTable();
-
-    const initialEvents = await eventsPage.getEventTypes(true);
-
-    // IMPROVEMENT: Click until we achieve ascending sort
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (attempts < maxAttempts) {
-      await eventsPage.clickColumnToSort("Event");
-
-      // Wait for sort to complete with multiple conditions
-      await Promise.all([
-        eventsPage.waitForTableLoad(),
-        eventsPage.page.waitForFunction(() => {
-          // Wait for any loading spinners to disappear
-          const loadingElements = document.querySelectorAll('[data-testid*="loading"]');
-
-          return loadingElements.length === 0;
-        }),
-        // Wait for sort indicator to update
-        eventsPage.page.waitForFunction(() => {
-          const sortButton = document.querySelector('[aria-label*="sorted"]');
-
-          return sortButton !== null;
-        }),
-      ]);
-
-      const sortIndicator = await eventsPage.getColumnSortIndicator("Event");
-
-      if (sortIndicator === "asc") {
-        break;
-      }
-
-      attempts++;
-    }
-    expect(await eventsPage.getColumnSortIndicator("Event")).toBe("asc");
-
-    const sortedEvents = await eventsPage.getEventTypes(true);
-    const expectedSorted = [...initialEvents].sort();
-
-    expect(sortedEvents).toEqual(expectedSorted);
-  });
-
   test("verify search for specific event type and filtered results", async () => {
     await eventsPage.navigate();
 

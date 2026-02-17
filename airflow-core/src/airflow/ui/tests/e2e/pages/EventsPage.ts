@@ -110,35 +110,6 @@ export class EventsPage extends BasePage {
     return row.locator("td").nth(index);
   }
 
-  public async getCellContent(rowIndex: number, cellIndex: number): Promise<string> {
-    const row = this.tableRows.nth(rowIndex);
-    const cell = row.locator("td").nth(cellIndex);
-    const content = await cell.textContent();
-
-    return content?.trim() ?? "";
-  }
-
-  public async getColumnSortIndicator(columnKey: string): Promise<"asc" | "desc" | "none"> {
-    const columnHeader = this.eventsTable.locator("th").filter({ hasText: new RegExp(columnKey, "i") });
-    const sortSvg = columnHeader.locator('svg[aria-label*="sorted"]');
-    const svgCount = await sortSvg.count();
-
-    if (svgCount > 0) {
-      const ariaLabel = (await sortSvg.first().getAttribute("aria-label")) ?? "";
-
-      if (ariaLabel) {
-        if (ariaLabel.includes("ascending")) {
-          return "asc";
-        }
-        if (ariaLabel.includes("descending")) {
-          return "desc";
-        }
-      }
-    }
-
-    return "none";
-  }
-
   public async getEventLogRows(): Promise<Array<Locator>> {
     const count = await this.tableRows.count();
 
@@ -172,6 +143,7 @@ export class EventsPage extends BasePage {
     }
 
     const allEventTypes = [...eventTypes];
+    const startUrl = this.page.url();
 
     while (await this.hasNextPage()) {
       await this.clickNextPage();
@@ -180,9 +152,8 @@ export class EventsPage extends BasePage {
       allEventTypes.push(...pageEvents);
     }
 
-    while ((await this.paginationPrevButton.count()) > 0 && (await this.paginationPrevButton.isEnabled())) {
-      await this.clickPrevPage();
-    }
+    await this.page.goto(startUrl, { timeout: 30_000, waitUntil: "domcontentloaded" });
+    await this.waitForTableLoad();
 
     return allEventTypes;
   }
@@ -218,14 +189,6 @@ export class EventsPage extends BasePage {
     const url = limit === undefined ? baseUrl : `${baseUrl}?offset=0&limit=${limit}`;
 
     await this.page.goto(url, {
-      timeout: 30_000,
-      waitUntil: "domcontentloaded",
-    });
-    await this.waitForTableLoad();
-  }
-
-  public async navigateToPaginatedEventsPage(limit: number = 5): Promise<void> {
-    await this.page.goto(`/events?offset=0&limit=${limit}`, {
       timeout: 30_000,
       waitUntil: "domcontentloaded",
     });
