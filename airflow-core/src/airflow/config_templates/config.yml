@@ -1758,6 +1758,23 @@ api:
       type: boolean
       example: ~
       default: "False"
+    client_ssl_cert:
+      description: |
+        Path to a PEM-encoded client SSL certificate to use
+        when the Task SDK connects to the Airflow Execution API.
+        Must be set together with ``client_ssl_key``.
+      version_added: ~
+      type: string
+      example: "/etc/airflow/certs/client.crt"
+      default: ~
+    client_ssl_key:
+      description: |
+        Path to the PEM-encoded private key corresponding to ``client_ssl_cert``.
+        Must be set together with ``client_ssl_cert``.
+      version_added: ~
+      type: string
+      example: "/etc/airflow/certs/client.key"
+      default: ~
 workers:
   description: Configuration related to workers that run Airflow tasks.
   options:
@@ -2024,13 +2041,6 @@ execution_api:
 lineage:
   description: ~
   options:
-    backend:
-      description: |
-        what lineage backend to use
-      version_added: ~
-      type: string
-      example: ~
-      default: ""
     max_assets_per_collector:
       description: |
         Maximum number of asset inputs or outputs that can be collected by a single hook lineage collector
